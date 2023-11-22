@@ -25,25 +25,65 @@ interface Message {
 function Room({ signUserOut }: { signUserOut: () => void }) {
   const { roomId } = useParams();
   const [newMessage, setNewMessage] = useState("");
-  const [messages, setMessages] = useState<{ [roomId: string]: Message[] }>({});
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [roomData, setRoomData] = useState<
+    { roomId: string; lastMessage?: Message; status?: { text: string } }[]
+  >([]);
   const messagesRef = useMemo(() => collection(db, "messages"), []);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true); // Add loading state
-  const [rooms, setRooms] = useState<string[]>([]); // State to store rooms
   useEffect(() => {
     const q = query(messagesRef, orderBy("createdAt"));
+
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const fetchedRooms: Set<string> = new Set();
+      const updatedRoomData: { roomId: string; lastMessage?: Message }[] = [];
+
       querySnapshot.forEach((doc) => {
-        const message = doc.data() as Message;
-        fetchedRooms.add(message.roomId);
+        const message = {
+          ...(doc.data() as Message),
+          id: doc.id,
+        };
+
+        const roomIndex = updatedRoomData.findIndex(
+          (room) => room.roomId === message.roomId
+        );
+
+        if (roomIndex === -1) {
+          // Room not found, add a new entry
+          updatedRoomData.push({
+            roomId: message.roomId,
+            lastMessage: message,
+          });
+        } else {
+          // Room found, update the last message if it's newer
+          if (
+            !updatedRoomData[roomIndex].lastMessage?.createdAt ||
+            (message.createdAt &&
+              message.createdAt.toMillis() >
+                updatedRoomData[roomIndex].lastMessage!.createdAt!.toMillis())
+          ) {
+            updatedRoomData[roomIndex].lastMessage = message;
+          }
+        }
       });
-      setRooms(Array.from(fetchedRooms));
+
+      // Rearrange the rooms based on the last message's createdAt date
+      updatedRoomData.sort((a, b) => {
+        const timeA = a.lastMessage?.createdAt?.toMillis() || 0;
+        const timeB = b.lastMessage?.createdAt?.toMillis() || 0;
+        return timeB - timeA;
+      });
+
+      setRoomData(updatedRoomData);
+
+      setLoading(false);
     });
+
     return () => {
       unsubscribe();
     };
   }, [messagesRef]);
+
   useEffect(() => {
     const q = query(
       messagesRef,
@@ -51,20 +91,15 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
       orderBy("createdAt")
     );
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const updatedMessages: Message[] = [];
+      const messages: Message[] = [];
 
       querySnapshot.forEach((doc) =>
-        updatedMessages.push({
+        messages.push({
           ...(doc.data() as Message),
           id: doc.id,
         })
       );
-
-      roomId &&
-        setMessages((prevMessages) => ({
-          ...prevMessages,
-          [roomId]: updatedMessages,
-        }));
+      setMessages(messages);
 
       setLoading(false);
       setTimeout(() => {
@@ -74,7 +109,6 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
         }
       }, 0);
     });
-
     return () => {
       unsubscribe();
     };
@@ -96,31 +130,6 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
 
     setNewMessage("");
   };
-  const getLastMessage = (roomId: string): Message | undefined => {
-    const roomMessages = messages[roomId] || [];
-
-    if (roomMessages.length === 0) {
-      return undefined; // No messages for this room
-    }
-
-    return roomMessages.reduce((prev, current) => {
-      if (!prev.createdAt && !current.createdAt) {
-        return prev;
-      }
-
-      if (!prev.createdAt) {
-        return current;
-      }
-
-      if (!current.createdAt) {
-        return prev;
-      }
-
-      return prev.createdAt.toMillis() > current.createdAt.toMillis()
-        ? prev
-        : current;
-    });
-  };
 
   const isSender = (messageUser: Message["user"]) => {
     return auth.currentUser?.email === messageUser?.email;
@@ -130,25 +139,34 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
     <div style={{ display: "flex" }}>
       <div>
         <h1>rooms</h1>
-
-        {rooms.map((room) => (
+        {roomData.map((room) => (
           <div
-            key={room}
+            key={room.roomId}
             style={{
+              width: "180px",
               display: "flex",
               height: "72",
               padding: "12px 16px",
-              alignItems: "center",
+
               gap: "16",
               alignSelf: "stretch",
             }}
-            onClick={() => navigate(`/room/${room}`)}
+            onClick={() => navigate(`/room/${room.roomId}`)}
           >
             <div>
-              <img src="" alt="" />
+              <img
+                style={{ width: "30px", borderRadius: "50%" }}
+                src="https://static.thenounproject.com/png/2837242-200.png"
+                alt=""
+              />
             </div>
             <div
-              style={{ display: "flex", gap: "4px", flexDirection: "column" }}
+              style={{
+                display: "flex",
+                gap: "4px",
+                flexDirection: "column",
+                width: "100%",
+              }}
             >
               <div style={{ display: "flex", gap: "4px" }}>
                 <div
@@ -162,19 +180,17 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
                     marginRight: "auto",
                   }}
                 >
-                  {room}
+                  {room.roomId}
                 </div>
                 <div>
-                  {getLastMessage(room)?.createdAt &&
-                    getLastMessage(room)
-                      ?.createdAt.toDate()
-                      .toLocaleString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                  {room.lastMessage?.createdAt &&
+                    room.lastMessage?.createdAt.toDate().toLocaleString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                 </div>
               </div>
-              <div>{getLastMessage(room)?.text}</div>
+              <div style={{ textAlign: "left" }}>{room.lastMessage?.text}</div>
             </div>
           </div>
         ))}
@@ -210,7 +226,10 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
             >
               {roomId}
             </div>
-            <div>last message</div>
+            <div>
+              {roomData.find((room) => room.roomId === roomId)?.status?.text ||
+                "Available to chat"}
+            </div>
           </div>
         </div>
 
@@ -229,48 +248,45 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
           }}
         >
           {loading && <p>Loading...</p>}
-          {roomId &&
-            messages[roomId]?.map((message: Message) => (
+          {messages.map((message) => (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: isSender(message.user)
+                  ? "flex-end"
+                  : "flex-start",
+                alignItems: "center",
+              }}
+              key={message.id}
+            >
+              <img
+                src={message.user.photoURL || "default-photo-url"}
+                alt="User"
+                style={{
+                  width: "30px",
+                  height: "30px",
+                  borderRadius: "50%",
+                  marginRight: "10px",
+                  order: isSender(message.user) ? 1 : 0,
+                }}
+              />
+
               <div
                 style={{
-                  display: "flex",
-                  justifyContent: isSender(message.user)
-                    ? "flex-end"
-                    : "flex-start",
-                  alignItems: "center",
+                  backgroundColor: isSender(message.user)
+                    ? "#DCF8C6"
+                    : "#EAEAEA",
+                  padding: "8px",
+                  borderRadius: "8px",
                 }}
-                key={message.id}
               >
-                <img
-                  src={message.user.photoURL || "default-photo-url"}
-                  alt="User"
-                  style={{
-                    width: "30px",
-                    height: "30px",
-                    borderRadius: "50%",
-                    marginRight: "10px",
-                    order: isSender(message.user) ? 1 : 0,
-                  }}
-                />
-
-                <div
-                  style={{
-                    backgroundColor: isSender(message.user)
-                      ? "#DCF8C6"
-                      : "#EAEAEA",
-                    padding: "8px",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <p
-                    style={{ margin: 0, fontWeight: "bold", fontSize: "10px" }}
-                  >
-                    {message.user.name}
-                  </p>
-                  <p style={{ margin: 0 }}>{message.text}</p>
-                </div>
+                <p style={{ margin: 0, fontWeight: "bold", fontSize: "10px" }}>
+                  {message.user.name}
+                </p>
+                <p style={{ margin: 0 }}>{message.text}</p>
               </div>
-            ))}
+            </div>
+          ))}
           <form
             onSubmit={handleSubmit}
             style={{
@@ -278,7 +294,7 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
               height: 56,
               padding: "8px 16px",
               alignItems: "center",
-              gap: "16 px",
+              gap: "16px",
               flexShrink: 0,
               alignSelf: "stretch",
               borderRadius: "12px",
@@ -290,8 +306,28 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
               onChange={(e) => setNewMessage(e.target.value)}
               value={newMessage}
               placeholder="Type a message"
+              style={{
+                padding: "8px",
+                borderRadius: "8px",
+                border: "1px solid #EAEAEA",
+                width: "100%",
+                height: "24px",
+              }}
             />
-            <button type="submit">Send</button>
+            <button type="submit">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M12.815 12.197L5.28299 13.453C5.19639 13.4675 5.11513 13.5045 5.04737 13.5603C4.97961 13.6161 4.92775 13.6888 4.89699 13.771L2.29999 20.728C2.05199 21.368 2.72099 21.978 3.33499 21.671L21.335 12.671C21.4597 12.6088 21.5645 12.513 21.6378 12.3945C21.7111 12.276 21.7499 12.1394 21.7499 12C21.7499 11.8607 21.7111 11.7241 21.6378 11.6055C21.5645 11.487 21.4597 11.3913 21.335 11.329L3.33499 2.32901C2.72099 2.02201 2.05199 2.63301 2.29999 3.27201L4.89799 10.229C4.9286 10.3114 4.98041 10.3843 5.04818 10.4403C5.11594 10.4963 5.19728 10.5335 5.28399 10.548L12.816 11.803C12.8623 11.8111 12.9043 11.8353 12.9346 11.8714C12.9649 11.9074 12.9815 11.9529 12.9815 12C12.9815 12.0471 12.9649 12.0926 12.9346 12.1287C12.9043 12.1647 12.8623 12.1889 12.816 12.197H12.815Z"
+                  fill="#8BABD8"
+                />
+              </svg>
+            </button>
           </form>
         </div>
       </div>
