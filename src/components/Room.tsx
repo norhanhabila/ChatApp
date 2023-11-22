@@ -291,14 +291,8 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
             onSubmit={handleSubmit}
             style={{
               display: "flex",
-              height: 56,
               padding: "8px 16px",
-              alignItems: "center",
               gap: "16px",
-              flexShrink: 0,
-              alignSelf: "stretch",
-              borderRadius: "12px",
-              border: "1px solid #EAEAEA",
             }}
           >
             <input
