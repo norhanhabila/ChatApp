@@ -2,6 +2,8 @@ import firebase from "firebase/compat/app";
 import {
   addDoc,
   collection,
+  getDocs,
+  limit,
   onSnapshot,
   orderBy,
   query,
@@ -117,18 +119,31 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (newMessage === "") return;
-    await addDoc(messagesRef, {
+    const newMessageObj = {
       text: newMessage,
-      createdAt: serverTimestamp(),
-      roomId: roomId,
+      createdAt: serverTimestamp() as firebase.firestore.Timestamp,
+      roomId: roomId || "",
       user: {
         name: auth.currentUser?.displayName,
         photoURL: auth.currentUser?.photoURL,
         email: auth.currentUser?.email,
       },
-    });
-
+    };
     setNewMessage("");
+    setMessages([...messages, newMessageObj]);
+    const existingMessagesQuery = query(
+      messagesRef,
+      where("text", "==", newMessage),
+      where("roomId", "==", newMessageObj.roomId),
+      orderBy("createdAt"),
+      limit(1)
+    );
+    const existingMessagesSnapshot = await getDocs(existingMessagesQuery);
+
+    if (existingMessagesSnapshot.empty) {
+      // If no matching messages found, add the message to Firestore
+      await addDoc(messagesRef, newMessageObj);
+    }
   };
 
   const isSender = (messageUser: Message["user"]) => {
