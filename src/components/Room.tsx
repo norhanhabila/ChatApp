@@ -12,7 +12,9 @@ import {
 } from "firebase/firestore";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid"; // Import the uuid library
 import { auth, db } from "../firebase-config";
+
 interface Message {
   text: string;
   createdAt: firebase.firestore.Timestamp;
@@ -119,6 +121,8 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (newMessage === "") return;
+    const temporaryId = uuidv4();
+
     const newMessageObj = {
       text: newMessage,
       createdAt: serverTimestamp() as firebase.firestore.Timestamp,
@@ -128,6 +132,7 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
         photoURL: auth.currentUser?.photoURL,
         email: auth.currentUser?.email,
       },
+      id: temporaryId,
     };
     setNewMessage("");
     setMessages([...messages, newMessageObj]);
@@ -274,6 +279,7 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
           {loading && <p>Loading...</p>}
           {messages.map((message) => (
             <div
+              key={message.id}
               style={{
                 display: "flex",
                 justifyContent: isSender(message.user)
@@ -282,7 +288,6 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
                 alignItems: "center",
                 margin: "5px",
               }}
-              key={message.id}
             >
               <img
                 src={message.user.photoURL || "default-photo-url"}

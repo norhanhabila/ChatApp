@@ -1,15 +1,6 @@
 {
   "hosting": {
-    "headers": [
-      {
-        "source": "**/*",
-        "headers": [
-          {
-            "key": "Cross-Origin-Opener-Policy",
-            "value": "same-origin"
-          }
-        ]
-      }
-    ]
+    "public": "public",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
   }
 }
