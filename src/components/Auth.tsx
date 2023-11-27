@@ -14,12 +14,19 @@ export const Auth = ({ setIsAuth }: authProps) => {
       cookies.set("auth-token", result.user.refreshToken);
       setIsAuth(true);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
   return (
-    <>
+    <div
+      style={{
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+      }}
+    >
       <button onClick={signInWithGoogle}> Sign in with Google</button>
-    </>
+    </div>
   );
 };

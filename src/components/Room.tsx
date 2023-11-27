@@ -1,5 +1,5 @@
-import firebase from "firebase/compat/app";
 import {
+  Timestamp,
   addDoc,
   collection,
   getDocs,
@@ -17,7 +17,7 @@ import { auth, db } from "../firebase-config";
 
 interface Message {
   text: string;
-  createdAt: firebase.firestore.Timestamp;
+  createdAt: Timestamp;
   roomId: string;
   user: {
     name: string | null | undefined;
@@ -125,7 +125,7 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
 
     const newMessageObj = {
       text: newMessage,
-      createdAt: serverTimestamp() as firebase.firestore.Timestamp,
+      createdAt: serverTimestamp() as Timestamp,
       roomId: roomId || "",
       user: {
         name: auth.currentUser?.displayName,

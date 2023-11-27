@@ -11,8 +11,9 @@
   },
   "dependencies": {
     "@types/bonjour": "^3.5.13",
+    "@types/firebase": "^3.2.1",
     "@types/react-router-dom": "^5.3.3",
-    "firebase": "^10.5.2",
+    "firebase": "^10.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-firebase-hooks": "^5.1.1",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
+    "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.3",

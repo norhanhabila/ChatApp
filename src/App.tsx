@@ -21,7 +21,6 @@ export default function App() {
 
   const signUserOut = async () => {
     await signOut(auth);
-    console.log("signed out");
     cookies.remove("auth-token");
     setIsAuth(false);
     setRoom("");
