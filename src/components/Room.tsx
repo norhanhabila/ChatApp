@@ -10,7 +10,7 @@ import {
   serverTimestamp,
   where,
 } from "firebase/firestore";
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { auth, db } from "../firebase-config";
 interface Message {
@@ -152,18 +152,27 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
   const navigate = useNavigate();
   return (
     <div style={{ display: "flex" }}>
-      <div>
-        <h1>rooms</h1>
+      <div style={{ margin: "10px" }}>
+        <p
+          style={{
+            borderBottom: "1px solid #D3D3D3",
+            textAlign: "left",
+            fontWeight: "bold",
+            fontSize: "30px",
+          }}
+        >
+          Rooms
+        </p>
         {roomData.map((room) => (
           <div
             key={room.roomId}
             style={{
               width: "180px",
               display: "flex",
-              height: "72",
+              height: "72px",
               padding: "12px 16px",
 
-              gap: "16",
+              gap: "16px",
               alignSelf: "stretch",
             }}
             onClick={() => navigate(`/room/${room.roomId}`)}
@@ -187,8 +196,7 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
                 <div
                   style={{
                     color: "var(--Rich-Black, #011627)",
-                    fontFamily: "Inter",
-                    fontSize: "16",
+                    fontSize: "16px",
                     fontStyle: "normal",
                     fontWeight: "600",
                     lineHeight: "20px",
@@ -211,12 +219,10 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
         ))}
       </div>
       <div>
-        <button onClick={() => navigate("/")}>Go out of Room</button>
-        <button onClick={signUserOut}>Sign out</button>
         <div
           style={{
             display: "flex",
-            height: "56",
+            height: "56px",
             padding: "8px 16px",
             alignItems: "flex-start",
             gap: "8",
@@ -231,8 +237,7 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
             <div
               style={{
                 color: "var(--Rich-Black, #011627)",
-                fontFamily: "Inter",
-                fontSize: "16",
+                fontSize: "16px",
                 fontStyle: "normal",
                 fontWeight: "600",
                 lineHeight: "20px",
@@ -246,6 +251,10 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
                 "Available to chat"}
             </div>
           </div>
+          <div style={{ display: "flex", marginLeft: "auto", gap: "10px" }}>
+            <button onClick={() => navigate("/")}>Go out of Room</button>
+            <button onClick={signUserOut}>Sign out</button>
+          </div>
         </div>
 
         <div
@@ -254,7 +263,7 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
             display: "flex",
             flexDirection: "column",
             width: "80vw",
-            height: "60vh",
+            height: "90vh",
             overflowY: "scroll",
             background:
               "url(https://st2.depositphotos.com/5334922/12300/v/450/depositphotos_123004960-Seamless-pattern-with-pink-flowers-Yellow-green-background-with-stylized-doodle-roses-Elegant-template-for-fashion-prints-Vector-illustration-Cute-vintage-floral-backdrop-for-summer-or-spring-design.jpg), lightgray 0% 0% / 60.00000238418579px 60.00000238418579px repeat",
@@ -271,6 +280,7 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
                   ? "flex-end"
                   : "flex-start",
                 alignItems: "center",
+                margin: "5px",
               }}
               key={message.id}
             >
@@ -308,6 +318,7 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
               display: "flex",
               padding: "8px 16px",
               gap: "16px",
+              marginTop: "auto",
             }}
           >
             <input

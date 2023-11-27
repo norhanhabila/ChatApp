@@ -1,4 +1,5 @@
 import { signInWithPopup } from "firebase/auth";
+import React from "react";
 import Cookies from "universal-cookie";
 import { auth, provider } from "../firebase-config";
 
