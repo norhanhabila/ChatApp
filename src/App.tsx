@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 import "./App.css";
-import { Auth } from "./components/Auth";
+import Auth from "./components/Auth";
 import Form from "./components/Form";
 import Room from "./components/Room";
 import { auth } from "./firebase-config";

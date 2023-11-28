@@ -1,21 +1,18 @@
-import { getRedirectResult, signInWithRedirect } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import Cookies from "universal-cookie";
-import { auth, provider } from "../firebase-config";
+import { auth } from "../firebase-config";
 
 const cookies = new Cookies();
 interface authProps {
   setIsAuth: (isAuth: boolean) => void;
 }
-export const Auth = ({ setIsAuth }: authProps) => {
+const Auth = ({ setIsAuth }: authProps) => {
   const signInWithGoogle = async () => {
-    provider.setCustomParameters({ prompt: "select_account" });
-
     try {
-      await signInWithRedirect(auth, provider);
+      await signInWithPopup(auth, new GoogleAuthProvider()).then((result) =>
+        cookies.set("auth-token", result.user.refreshToken)
+      );
 
-      // Handle the redirect result (this should be done in a different component or in the main app component)
-      const result = await getRedirectResult(auth);
-      cookies.set("auth-token", result?.user?.refreshToken);
       setIsAuth(true);
     } catch (err) {
       console.error(err);
@@ -35,3 +32,4 @@ export const Auth = ({ setIsAuth }: authProps) => {
     </div>
   );
 };
+export default Auth;
