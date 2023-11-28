@@ -8,7 +8,7 @@ import Form from "./components/Form";
 import Room from "./components/Room";
 import { auth } from "./firebase-config";
 const cookies = new Cookies();
-export default function App() {
+const App = () => {
   const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
   const [room, setRoom] = useState("");
   const navigate = useNavigate();
@@ -57,4 +57,5 @@ export default function App() {
       />
     </Routes>
   );
-}
+};
+export default App;
