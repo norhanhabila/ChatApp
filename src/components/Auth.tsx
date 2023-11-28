@@ -9,6 +9,7 @@ interface authProps {
 }
 export const Auth = ({ setIsAuth }: authProps) => {
   const signInWithGoogle = async () => {
+    provider.setCustomParameters({ prompt: "select_account" });
     try {
       const result = await signInWithPopup(auth, provider);
       cookies.set("auth-token", result.user.refreshToken);
@@ -17,6 +18,7 @@ export const Auth = ({ setIsAuth }: authProps) => {
       console.error(err);
     }
   };
+
   return (
     <div
       style={{
