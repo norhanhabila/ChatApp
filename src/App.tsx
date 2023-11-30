@@ -40,6 +40,7 @@ const App = () => {
         path="/room/:roomId"
         element={<Room signUserOut={signUserOut} />}
       ></Route>
+
       <Route
         path="/"
         element={
