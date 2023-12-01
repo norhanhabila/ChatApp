@@ -13,7 +13,7 @@ import {
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid"; // Import the uuid library
-import { auth, db } from "../firebase-config";
+import { db } from "../firebase-config";
 
 interface Message {
   text: string;
@@ -26,7 +26,17 @@ interface Message {
   };
   id?: string;
 }
-function Room({ signUserOut }: { signUserOut: () => void }) {
+function Room({
+  signUserOut,
+  user,
+}: {
+  signUserOut: () => void;
+  user: {
+    displayName: string | null;
+    email: string | null;
+    photoURL: string | null;
+  };
+}) {
   const { roomId } = useParams();
   const [newMessage, setNewMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -36,6 +46,7 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
   const messagesRef = useMemo(() => collection(db, "messages"), []);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true); // Add loading state
+
   useEffect(() => {
     const q = query(messagesRef, orderBy("createdAt"));
 
@@ -128,9 +139,9 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
       createdAt: serverTimestamp() as Timestamp,
       roomId: roomId || "",
       user: {
-        name: auth.currentUser?.displayName,
-        photoURL: auth.currentUser?.photoURL,
-        email: auth.currentUser?.email,
+        name: user?.displayName,
+        photoURL: user?.photoURL,
+        email: user?.email,
       },
       id: temporaryId,
     };
@@ -152,7 +163,7 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
   };
 
   const isSender = (messageUser: Message["user"]) => {
-    return auth.currentUser?.email === messageUser?.email;
+    return user?.email === messageUser?.email;
   };
   const navigate = useNavigate();
   return (

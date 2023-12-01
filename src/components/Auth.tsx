@@ -1,3 +1,4 @@
+// Auth.jsx
 import { GoogleAuthProvider } from "firebase/auth";
 import { useEffect } from "react";
 import Cookies from "universal-cookie";
@@ -5,10 +6,17 @@ import { auth, ui } from "../firebase-config";
 
 const cookies = new Cookies();
 
-const Auth = ({ setIsAuth }: { setIsAuth: (arg0: boolean) => void }) => {
+const Auth = ({
+  setIsAuth,
+  setUser,
+}: {
+  setIsAuth: (arg0: boolean) => void;
+  setUser: (user: User | null) => void;
+}) => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
+        setUser(user); // Pass the user to the parent component
         const refreshToken = user.refreshToken;
         cookies.set("auth-token", refreshToken);
         setIsAuth(true);
@@ -23,7 +31,7 @@ const Auth = ({ setIsAuth }: { setIsAuth: (arg0: boolean) => void }) => {
 
     // Cleanup the listener when the component unmounts
     return () => unsubscribe();
-  }, [setIsAuth]);
+  }, [setIsAuth, setUser]);
 
   return (
     <div

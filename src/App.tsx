@@ -10,6 +10,8 @@ import { auth } from "./firebase-config";
 const cookies = new Cookies();
 const App = () => {
   const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
+  const [user, setUser] = useState<User | null>(null); // Assuming User is the correct type for your user object
+
   const [room, setRoom] = useState("");
   const navigate = useNavigate();
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -29,7 +31,7 @@ const App = () => {
   if (!isAuth) {
     return (
       <>
-        <Auth setIsAuth={setIsAuth} />
+        <Auth setIsAuth={setIsAuth} setUser={setUser} />
       </>
     );
   }
@@ -38,7 +40,7 @@ const App = () => {
     <Routes>
       <Route
         path="/room/:roomId"
-        element={<Room signUserOut={signUserOut} />}
+        element={<Room user={user} signUserOut={signUserOut} />}
       ></Route>
 
       <Route
@@ -52,7 +54,7 @@ const App = () => {
               signUserOut={signUserOut}
             />
           ) : (
-            <Auth setIsAuth={setIsAuth} />
+            <Auth setIsAuth={setIsAuth} setUser={setUser} />
           )
         }
       />
