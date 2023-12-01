@@ -35,9 +35,10 @@ function Room({
     displayName: string | null;
     email: string | null;
     photoURL: string | null;
-  };
+  } | null;
 }) {
   const { roomId } = useParams();
+
   const [newMessage, setNewMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [roomData, setRoomData] = useState<
@@ -166,6 +167,7 @@ function Room({
     return user?.email === messageUser?.email;
   };
   const navigate = useNavigate();
+
   return (
     <div style={{ display: "flex" }}>
       <div style={{ margin: "10px" }}>

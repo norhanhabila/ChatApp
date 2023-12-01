@@ -10,7 +10,11 @@ import { auth } from "./firebase-config";
 const cookies = new Cookies();
 const App = () => {
   const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
-  const [user, setUser] = useState<User | null>(null); // Assuming User is the correct type for your user object
+  const [user, setUser] = useState<{
+    displayName: string | null;
+    email: string | null;
+    photoURL: string | null;
+  } | null>(null); // Assuming User is the correct type for your user object
 
   const [room, setRoom] = useState("");
   const navigate = useNavigate();
@@ -27,11 +31,16 @@ const App = () => {
     setIsAuth(false);
     setRoom("");
   };
+  if (!user) signUserOut();
 
   if (!isAuth) {
     return (
       <>
-        <Auth setIsAuth={setIsAuth} setUser={setUser} />
+        <Auth
+          setIsAuth={setIsAuth}
+          setUser={setUser}
+          signUserOut={signUserOut}
+        />
       </>
     );
   }
@@ -54,7 +63,11 @@ const App = () => {
               signUserOut={signUserOut}
             />
           ) : (
-            <Auth setIsAuth={setIsAuth} setUser={setUser} />
+            <Auth
+              setIsAuth={setIsAuth}
+              setUser={setUser}
+              signUserOut={signUserOut}
+            />
           )
         }
       />

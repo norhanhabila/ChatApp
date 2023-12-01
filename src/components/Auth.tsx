@@ -9,20 +9,28 @@ const cookies = new Cookies();
 const Auth = ({
   setIsAuth,
   setUser,
+  signUserOut,
 }: {
   setIsAuth: (arg0: boolean) => void;
-  setUser: (user: User | null) => void;
+  setUser: (
+    user: {
+      displayName: string | null;
+      email: string | null;
+      photoURL: string | null;
+    } | null
+  ) => void;
+  signUserOut: () => void;
 }) => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        setUser(user); // Pass the user to the parent component
         const refreshToken = user.refreshToken;
         cookies.set("auth-token", refreshToken);
         setIsAuth(true);
+        setUser(user); // Pass the user to the parent component
       } else {
         setIsAuth(false);
-
+        signUserOut();
         ui.start("#firebaseui-auth-container", {
           signInOptions: [new GoogleAuthProvider().providerId],
         });
@@ -31,7 +39,7 @@ const Auth = ({
 
     // Cleanup the listener when the component unmounts
     return () => unsubscribe();
-  }, [setIsAuth, setUser]);
+  }, [setIsAuth, setUser, signUserOut]);
 
   return (
     <div
