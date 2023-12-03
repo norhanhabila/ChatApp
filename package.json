@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@types/bonjour": "^3.5.13",
-    "@types/react-router-dom": "^5.3.3",
+    "@types/firebase": "^3.2.1",
     "firebase": "^10.7.0",
     "firebaseui": "^6.1.0",
     "react": "^18.2.0",
