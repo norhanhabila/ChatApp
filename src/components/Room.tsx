@@ -170,7 +170,7 @@ function Room({
 
   return (
     <div style={{ display: "flex" }}>
-      <div style={{ margin: "10px" }}>
+      <div style={{ margin: "10px", width: "300px" }}>
         <p
           style={{
             borderBottom: "1px solid #D3D3D3",

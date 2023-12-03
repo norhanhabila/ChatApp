@@ -26,6 +26,7 @@ const Auth = ({
       if (user) {
         const refreshToken = user.refreshToken;
         cookies.set("auth-token", refreshToken);
+        console.log(cookies.get("auth-token"));
         setIsAuth(true);
         setUser(user); // Pass the user to the parent component
       } else {
