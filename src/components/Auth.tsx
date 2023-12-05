@@ -30,6 +30,7 @@ const Auth = ({
         setIsAuth(true);
         setUser(user); // Pass the user to the parent component
       } else {
+        console.log(user);
         setIsAuth(false);
         signUserOut();
         ui.start("#firebaseui-auth-container", {
