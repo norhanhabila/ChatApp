@@ -5,13 +5,15 @@ import Cookies from "universal-cookie";
 import "./App.css";
 import Auth from "./components/Auth";
 import Form from "./components/Form";
-import Room from "./components/Room";
+import Room, { User } from "./components/Room";
 import { auth } from "./firebase-config";
 const cookies = new Cookies();
 const App = () => {
   const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
   const [room, setRoom] = useState("");
+  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
+  console.log(auth.currentUser);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (room === "") return;
@@ -29,7 +31,11 @@ const App = () => {
   if (!isAuth) {
     return (
       <>
-        <Auth setIsAuth={setIsAuth} />
+        <Auth
+          setIsAuth={setIsAuth}
+          signUserOut={signUserOut}
+          setUser={setUser}
+        />
       </>
     );
   }
@@ -38,7 +44,7 @@ const App = () => {
     <Routes>
       <Route
         path="/room/:roomId"
-        element={<Room signUserOut={signUserOut} />}
+        element={<Room signUserOut={signUserOut} user={user} />}
       ></Route>
 
       <Route
@@ -52,7 +58,11 @@ const App = () => {
               signUserOut={signUserOut}
             />
           ) : (
-            <Auth setIsAuth={setIsAuth} />
+            <Auth
+              setIsAuth={setIsAuth}
+              signUserOut={signUserOut}
+              setUser={setUser}
+            />
           )
         }
       />

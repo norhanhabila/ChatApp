@@ -13,20 +13,27 @@ import {
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid"; // Import the uuid library
-import { auth, db } from "../firebase-config";
+import { db } from "../firebase-config";
 
+export interface User {
+  displayName: string | null | undefined;
+  photoURL: string | null | undefined;
+  email: string | null | undefined;
+}
 interface Message {
   text: string;
   createdAt: Timestamp;
   roomId: string;
-  user: {
-    name: string | null | undefined;
-    photoURL: string | null | undefined;
-    email: string | null | undefined;
-  };
+  user: User;
   id?: string;
 }
-function Room({ signUserOut }: { signUserOut: () => void }) {
+function Room({
+  signUserOut,
+  user,
+}: {
+  signUserOut: () => void;
+  user: User | null;
+}) {
   const { roomId } = useParams();
   const [newMessage, setNewMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -36,6 +43,7 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
   const messagesRef = useMemo(() => collection(db, "messages"), []);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true); // Add loading state
+
   useEffect(() => {
     const q = query(messagesRef, orderBy("createdAt"));
 
@@ -122,37 +130,38 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
     e.preventDefault();
     if (newMessage === "") return;
     const temporaryId = uuidv4();
+    if (user) {
+      const newMessageObj = {
+        text: newMessage,
+        createdAt: serverTimestamp() as Timestamp,
+        roomId: roomId || "",
+        user: {
+          displayName: user?.displayName,
+          photoURL: user?.photoURL,
+          email: user?.email,
+        },
+        id: temporaryId,
+      };
+      setNewMessage("");
+      setMessages([...messages, newMessageObj]);
+      const existingMessagesQuery = query(
+        messagesRef,
+        where("text", "==", newMessage),
+        where("roomId", "==", newMessageObj.roomId),
+        orderBy("createdAt"),
+        limit(1)
+      );
+      const existingMessagesSnapshot = await getDocs(existingMessagesQuery);
 
-    const newMessageObj = {
-      text: newMessage,
-      createdAt: serverTimestamp() as Timestamp,
-      roomId: roomId || "",
-      user: {
-        name: auth.currentUser?.displayName,
-        photoURL: auth.currentUser?.photoURL,
-        email: auth.currentUser?.email,
-      },
-      id: temporaryId,
-    };
-    setNewMessage("");
-    setMessages([...messages, newMessageObj]);
-    const existingMessagesQuery = query(
-      messagesRef,
-      where("text", "==", newMessage),
-      where("roomId", "==", newMessageObj.roomId),
-      orderBy("createdAt"),
-      limit(1)
-    );
-    const existingMessagesSnapshot = await getDocs(existingMessagesQuery);
-
-    if (existingMessagesSnapshot.empty) {
-      // If no matching messages found, add the message to Firestore
-      await addDoc(messagesRef, newMessageObj);
+      if (existingMessagesSnapshot.empty) {
+        // If no matching messages found, add the message to Firestore
+        await addDoc(messagesRef, newMessageObj);
+      }
     }
   };
 
   const isSender = (messageUser: Message["user"]) => {
-    return auth.currentUser?.email === messageUser?.email;
+    return user?.email === messageUser?.email;
   };
   const navigate = useNavigate();
   return (
@@ -311,7 +320,7 @@ function Room({ signUserOut }: { signUserOut: () => void }) {
                 }}
               >
                 <p style={{ margin: 0, fontWeight: "bold", fontSize: "10px" }}>
-                  {message.user.name}
+                  {message.user.displayName}
                 </p>
                 <p style={{ margin: 0 }}>{message.text}</p>
               </div>
