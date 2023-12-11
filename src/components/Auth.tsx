@@ -26,7 +26,7 @@ const Auth = ({
       setIsAuth(true);
     } else {
       setIsAuth(false);
-      signUserOut;
+      signUserOut();
     }
   };
 
