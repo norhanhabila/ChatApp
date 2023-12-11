@@ -44,7 +44,7 @@ const Auth = ({
         buttonText="Login with Google"
         onSuccess={responseGoogle}
         onFailure={responseGoogle}
-        cookiePolicy={"single_host_origin"}
+        // cookiePolicy={"single_host_origin"}
       />
     </div>
   );
