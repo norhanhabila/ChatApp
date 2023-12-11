@@ -21,6 +21,7 @@ const App = () => {
   const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
   const [room, setRoom] = useState("");
   const navigate = useNavigate();
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (room === "") return;
@@ -43,7 +44,6 @@ const App = () => {
     setIsAuth(false);
     setRoom("");
   };
-  if (!user) signUserOut();
 
   if (!isAuth) {
     return (

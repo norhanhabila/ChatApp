@@ -23,7 +23,7 @@ const Form = ({ handleSubmit, room, setRoom, signUserOut }: FormProps) => {
           buttonText="LogOut"
           onLogoutSuccess={signUserOut}
         />
-      </div>
+      </div>{" "}
       <form onSubmit={handleSubmit}>
         <label>Room</label>
         <input
