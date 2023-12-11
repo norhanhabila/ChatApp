@@ -1,47 +1,34 @@
-// Auth.jsx
-import { GoogleAuthProvider } from "firebase/auth";
-import { useEffect } from "react";
+import {
+  GoogleLogin,
+  GoogleLoginResponse,
+  GoogleLoginResponseOffline,
+} from "react-google-login";
 import Cookies from "universal-cookie";
-import { auth, ui } from "../firebase-config";
-
+import { User } from "../App";
 const cookies = new Cookies();
 
 const Auth = ({
   setIsAuth,
-  setUser,
   signUserOut,
+  setUser,
 }: {
   setIsAuth: (arg0: boolean) => void;
-  setUser: (
-    user: {
-      displayName: string | null;
-      email: string | null;
-      photoURL: string | null;
-    } | null
-  ) => void;
   signUserOut: () => void;
+  setUser: (arg0: User) => void;
 }) => {
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        const refreshToken = user.refreshToken;
-        cookies.set("auth-token", refreshToken);
-        console.log(cookies.get("auth-token"));
-        setIsAuth(true);
-        setUser(user); // Pass the user to the parent component
-      } else {
-        console.log(user);
-        setIsAuth(false);
-        signUserOut();
-        ui.start("#firebaseui-auth-container", {
-          signInOptions: [new GoogleAuthProvider().providerId],
-        });
-      }
-    });
-
-    // Cleanup the listener when the component unmounts
-    return () => unsubscribe();
-  }, [setIsAuth, setUser, signUserOut]);
+  const responseGoogle = (
+    response: GoogleLoginResponse | GoogleLoginResponseOffline
+  ) => {
+    // Handle the Google login response here
+    if ("tokenId" in response) {
+      cookies.set("auth-token", response.tokenObj.access_token);
+      setUser(response.profileObj);
+      setIsAuth(true);
+    } else {
+      setIsAuth(false);
+      signUserOut;
+    }
+  };
 
   return (
     <div
@@ -52,7 +39,13 @@ const Auth = ({
         transform: "translate(-50%, -50%)",
       }}
     >
-      <div id="firebaseui-auth-container"></div>
+      <GoogleLogin
+        clientId="730353852212-boo8vnhjvg9ah0nf8gns4ok0mmd8ie4v.apps.googleusercontent.com"
+        buttonText="Login with Google"
+        onSuccess={responseGoogle}
+        onFailure={responseGoogle}
+        cookiePolicy={"single_host_origin"}
+      />
     </div>
   );
 };

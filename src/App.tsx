@@ -1,5 +1,5 @@
-import { signOut } from "firebase/auth";
-import React, { useState } from "react";
+import { gapi } from "gapi-script";
+import React, { useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 import "./App.css";
@@ -8,25 +8,40 @@ import Form from "./components/Form";
 import Room from "./components/Room";
 import { auth } from "./firebase-config";
 const cookies = new Cookies();
+export interface User {
+  email: string;
+  familyName?: string;
+  givenName?: string;
+  googleId?: string;
+  imageUrl: string;
+  name: string;
+}
+
 const App = () => {
+  const [user, setUser] = useState<User | null>(null);
   const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
-  const [user, setUser] = useState<{
-    displayName: string | null;
-    email: string | null;
-    photoURL: string | null;
-  } | null>(null); // Assuming User is the correct type for your user object
 
   const [room, setRoom] = useState("");
   const navigate = useNavigate();
+  console.log(auth.currentUser);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (room === "") return;
     navigate(`/room/${room}`);
     setRoom("");
   };
+  useEffect(() => {
+    function start() {
+      gapi.client.init({
+        clientId:
+          "730353852212-boo8vnhjvg9ah0nf8gns4ok0mmd8ie4v.apps.googleusercontent.com",
+        scope: "",
+      });
+    }
+    gapi.load("client:auth2", start);
+  }, []);
 
-  const signUserOut = async () => {
-    await signOut(auth);
+  const signUserOut = () => {
     cookies.remove("auth-token");
     setIsAuth(false);
     setRoom("");
@@ -38,8 +53,8 @@ const App = () => {
       <>
         <Auth
           setIsAuth={setIsAuth}
-          setUser={setUser}
           signUserOut={signUserOut}
+          setUser={setUser}
         />
       </>
     );
@@ -49,7 +64,7 @@ const App = () => {
     <Routes>
       <Route
         path="/room/:roomId"
-        element={<Room user={user} signUserOut={signUserOut} />}
+        element={<Room signUserOut={signUserOut} user={user} />}
       ></Route>
 
       <Route
@@ -65,8 +80,8 @@ const App = () => {
           ) : (
             <Auth
               setIsAuth={setIsAuth}
-              setUser={setUser}
               signUserOut={signUserOut}
+              setUser={setUser}
             />
           )
         }

@@ -5,19 +5,23 @@
 
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="google-signin-client_id"
+      content="730353852212-boo8vnhjvg9ah0nf8gns4ok0mmd8ie4v.apps.googleusercontent.com"
+    />
+
     <title>Vite + React + TS</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="./src/main.tsx"></script>
-    <script src="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-firestore.js"></script>
 
-    <link
-      type="text/css"
-      rel="stylesheet"
-      href="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.css"
-    />
+    <!-- New library -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
+    ></script>
   </body>
 </html>
