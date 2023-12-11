@@ -33,7 +33,7 @@ const App = () => {
       gapi.client.init({
         clientId:
           "730353852212-boo8vnhjvg9ah0nf8gns4ok0mmd8ie4v.apps.googleusercontent.com",
-        scope: "",
+        scope: "profile email",
       });
     }
     gapi.load("client:auth2", start);
