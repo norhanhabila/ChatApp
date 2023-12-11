@@ -11,15 +11,11 @@ import {
   where,
 } from "firebase/firestore";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { GoogleLogout } from "react-google-login";
 import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid"; // Import the uuid library
+import { User } from "../App";
 import { db } from "../firebase-config";
-
-export interface User {
-  displayName: string | null | undefined;
-  photoURL: string | null | undefined;
-  email: string | null | undefined;
-}
 interface Message {
   text: string;
   createdAt: Timestamp;
@@ -136,8 +132,8 @@ function Room({
         createdAt: serverTimestamp() as Timestamp,
         roomId: roomId || "",
         user: {
-          displayName: user?.displayName,
-          photoURL: user?.photoURL,
+          name: user?.name,
+          imageUrl: user?.imageUrl,
           email: user?.email,
         },
         id: temporaryId,
@@ -267,7 +263,13 @@ function Room({
           </div>
           <div style={{ display: "flex", marginLeft: "auto", gap: "10px" }}>
             <button onClick={() => navigate("/")}>Go out of Room</button>
-            <button onClick={signUserOut}>Sign out</button>
+            <div id="signOutButton">
+              <GoogleLogout
+                clientId="730353852212-boo8vnhjvg9ah0nf8gns4ok0mmd8ie4v.apps.googleusercontent.com"
+                buttonText="LogOut"
+                onLogoutSuccess={signUserOut}
+              />
+            </div>
           </div>
         </div>
 
@@ -299,7 +301,7 @@ function Room({
               }}
             >
               <img
-                src={message.user.photoURL || "default-photo-url"}
+                src={message.user.imageUrl || "default-photo-url"}
                 alt="User"
                 style={{
                   width: "30px",
@@ -320,7 +322,7 @@ function Room({
                 }}
               >
                 <p style={{ margin: 0, fontWeight: "bold", fontSize: "10px" }}>
-                  {message.user.displayName}
+                  {message.user.name}
                 </p>
                 <p style={{ margin: 0 }}>{message.text}</p>
               </div>

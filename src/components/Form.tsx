@@ -1,4 +1,5 @@
 import React from "react";
+import { GoogleLogout } from "react-google-login";
 
 interface FormProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -16,7 +17,13 @@ const Form = ({ handleSubmit, room, setRoom, signUserOut }: FormProps) => {
         transform: "translate(-50%, -50%)",
       }}
     >
-      <button onClick={signUserOut}>Sign Out</button>
+      <div id="signOutButton">
+        <GoogleLogout
+          clientId="730353852212-boo8vnhjvg9ah0nf8gns4ok0mmd8ie4v.apps.googleusercontent.com"
+          buttonText="LogOut"
+          onLogoutSuccess={signUserOut}
+        />
+      </div>{" "}
       <form onSubmit={handleSubmit}>
         <label>Room</label>
         <input
