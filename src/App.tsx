@@ -6,7 +6,6 @@ import "./App.css";
 import Auth from "./components/Auth";
 import Form from "./components/Form";
 import Room from "./components/Room";
-import { auth } from "./firebase-config";
 const cookies = new Cookies();
 export interface User {
   email: string;
@@ -20,10 +19,8 @@ export interface User {
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
-
   const [room, setRoom] = useState("");
   const navigate = useNavigate();
-  console.log(auth.currentUser);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (room === "") return;
