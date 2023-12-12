@@ -1,27 +1,44 @@
-# React + TypeScript + Vite
+# React Chat App with Firebase and Google Auth
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple chat app built with React, Firebase Realtime Database, and Google Authentication. Deployed on Vercel.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Real-time chat
+- Google Authentication
+- Firebase Realtime Database
+- Responsive design
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+1. Clone the repository: `git clone https://github.com/norhanhabila/ChatApp`
+2. Install dependencies: `cd Little_chat && yarn`
 
-- Configure the top-level `parserOptions` property like this:
+## Configuration
 
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
-```
+- Set up Firebase: Create a project, obtain config.
+- Enable Google Auth.
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Usage
+
+Start the app: `yarn start`
+
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+## Deployment
+
+Deployed on Vercel. Link https://chat-app-norhan-habilas-projects.vercel.app/
+
+## Contributing
+
+Feel free to contribute by submitting issues or pull requests.
+
+## License
+
+This project is licensed under the MIT License.
+
+## Screenshots
+
+![Chat Screen](/src/assets/chat.png)
+
+![Authentication Screen](/src/assets/auth.png)
